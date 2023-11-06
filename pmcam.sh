@@ -1,10 +1,50 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-OUTPUT_DIR="$SCRIPT_DIR/images"
-
+DIFF_LIMIT=100 #might need to be adjusted
+OUTPUT_DIR="" #if empty output dir is current dir
 CAPTURE_INTERVAL="1" # in seconds
+
+#ntfy topic, make sure to make it random/difficult as it is basicly a password.
+#at the moment it will spam ntfy every second if there is motion. needs to be fixed.
+NTFY=false
+NTFY_TOPIC=""
+
+MOTION_MSG="Motion detected at \$(date +"%H:%M:%S") \(Diff = \$DIFF\)"
+SKIP_MSG="Same as previous image: delete \(Diff = \$DIFF\)"
+NTFY_MSG=$MOTION_MSG
+
 FFMPEG=ffmpeg
+
+#bool stuff
+DISPLAY_SKIPPED=true
+
+##END EDIT
+DEPENDENCIES=(
+	"ffmpeg"
+	"curl"
+	"convert"
+)
+
+echo -n "Checking dependencies... "
+for name in ${DEPENDENCIES[@]}; do
+  type $name >/dev/null 2>&1 || { echo -en >&2 "\nI require $name but it's not installed."; deps=1; }
+done
+[[ $deps -ne 1 ]] && echo "OK" || { echo -en "\nInstall the above and rerun this script. Aborting\n"; exit 1; }
+
+#if ntfy_topic not set make a random one, and save it for the future
+if [[ $NTFY == true && -n $NTFY_TOPIC && -s NTFY_TOPIC ]]; then
+	NTFY_TOPIC=$(<NTFY_TOPIC)
+elif [[ $NTFY == true && -z $NTFY_TOPIC ]]; then 
+	NTFY_TOPIC=$(echo $RANDOM | md5sum | head -c 20)
+	echo $NTFY_TOPIC > NTFY_TOPIC
+fi
+
+
+if [[ -z $OUTPUT_DIR ]]; then
+	SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+	OUTPUT_DIR="$SCRIPT_DIR/images"
+fi
+
 command -v $FFMPEG >/dev/null 2>&1 || { FFMPEG=avconv ; }
 DIFF_RESULT_FILE=$OUTPUT_DIR/diff_results.txt
 
@@ -40,10 +80,18 @@ while true ; do
 		DIFF="$(cat $DIFF_RESULT_FILE)"
 		fn_cleanup
 		if [ "$DIFF" -lt 20 ]; then
-			echo "Same as previous image: delete (Diff = $DIFF)"
+			if [ $DISPLAY_SKIPPED == true ]; then
+                   eval "echo $SKIP_MSG"
+            fi
 			rm -f $FILENAME
 		else
-			echo "Different image: keep (Diff = $DIFF)"
+			eval "echo $MOTION_MSG"
+
+			if [[ $NTFY == true && -n $NTFY_TOPIC ]]; then
+				echo "ntfy"
+				curl -d "$(eval "echo $NTFY_MSG")" ntfy.sh/$NTFY_TOPIC
+			fi
+
 			PREVIOUS_FILENAME="$FILENAME"
 		fi
 	else
