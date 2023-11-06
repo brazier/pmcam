@@ -8,16 +8,12 @@ Frames are captured at regular intervals using `ffmpeg`. Then ImageMagick's `com
 
 ### OS X
 
-	brew install ffmpeg
-	brew install imagemagick
-	curl -O https://raw.github.com/laurent22/pmcam/master/pmcam.sh
+	Not tested
 
 ### Linux (Debian)
 
-	sudo apt-get install ffmpeg
-	# or: sudo apt-get install libav-tools
-	sudo apt-get install imagemagick
-	curl -O https://raw.github.com/laurent22/pmcam/master/pmcam.sh
+	sudo apt-get install ffmpeg imagemagick curl
+	curl -O https://raw.github.com/brazier/pmcam/master/pmcam.sh
 
 ### Windows
 
