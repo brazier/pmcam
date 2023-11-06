@@ -1,6 +1,6 @@
 # pmcam - poor man's video capture with motion detection in Bash
 
-This simple Bash script captures images from a webcam with motion detection support. I wanted to find out what my dog was up to when I am not at home, but could not find any free video capture software on OS X. I put together this quick and dirty solution, which does the job surprisingly well.
+This simple Bash script captures images from a webcam with motion detection support.I wanted to change some settings from the original, [laurent22/pmcam](https://github.com/jaclu/pmcam), and also add some new features such as the ability send notifications with [NTFY](ntfy.sh). Also borrowed some things from [jaclu/pmcam](https://github.com/jaclu/pmcam)
 
 Frames are captured at regular intervals using `ffmpeg`. Then ImageMagick's `compare` tool is used to check if this frame is similar to the previous one. If the frames are different enough, they are kept, otherwise they are deleted. This provide very simple motion detection and avoids filling up the hard drive with duplicate frames.
 
@@ -22,6 +22,22 @@ Frames are captured at regular intervals using `ffmpeg`. Then ImageMagick's `com
 * Install [Cygwin](https://www.cygwin.com/) or [MinGW](http://www.mingw.org/)
 * Install [ffmpeg](http://ffmpeg.zeranoe.com/builds/)
 * Install [ImageMagick](http://www.imagemagick.org/script/binary-releases.php)
+
+
+## Configuration
+
+The primary config options are:
+
+    DIFF_LIMIT          cut-off for what changes should be saved
+    OUTPUT_DIR          where to save matching imgs
+    CAPTURE_INTERVALS	how often to capture/check for motion.
+    NTFY_TOPIC          Topic to use with ntfy, if NTFY set to true and NTFY_TOPIC is not set, a random 20 char wil be made.
+    
+    Booleans, true/false
+    NTFY                send notifications to [ntfy](ntfy.sh)
+    DISPLAY_SKIPPED     display info about ignored images
+
+Set them as you see fit.
 
 ## Usage
 
