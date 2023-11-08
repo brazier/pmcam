@@ -1,41 +1,49 @@
 # pmcam - poor man's video capture with motion detection in Bash
 
-This simple Bash script captures images from a webcam with motion detection support. I wanted to change some settings from the original, [laurent22/pmcam](https://github.com/jaclu/pmcam), and also add some new features such as the ability send notifications with [NTFY](https://ntfy.sh). Also borrowed some things from [jaclu/pmcam](https://github.com/jaclu/pmcam)
+This simple Bash script captures images from a webcam with motion detection support. I wanted to change some settings from the original, [laurent22/pmcam](https://github.com/jaclu/pmcam), and also add some new features such as video capture and the ability send notifications with [NTFY](https://ntfy.sh). Also borrowed some things from [jaclu/pmcam](https://github.com/jaclu/pmcam)
 
-Frames are captured at regular intervals using `ffmpeg`. Then ImageMagick's `compare` tool is used to check if this frame is similar to the previous one If the frames are different enough, they are kept, otherwise they are deleted. A notification will be sent, if motion is detected. This provide very simple motion detection and avoids filling up the hard drive with duplicate frames.
+Frames are captured at regular intervals using `ffmpeg`. Then ImageMagick's `compare` tool is used to check if this frame is similar to the previous one.
+
+There are now two modes, 
+Image mode: If the frames are different enough, they are kept, otherwise they are deleted. This provide very simple motion detection and avoids filling up the hard drive with duplicate frames.
+
+Video mode: If the frames are different enough, video capture will be started. It will then stop a defined amount of seconds later if no further motion is detected.
+
+Curl is then used to send a notification to [ntfy.sh](https://ntfy.sh)
 
 ## Installation
 
 ### OS X
 
-Not tested
+Not tested, unsupported as of now since v4l2loopback is needed to capture motion and record from the same device
 
 ### Linux (Debian)
 
-	sudo apt-get install ffmpeg imagemagick curl
+	sudo apt-get install ffmpeg imagemagick curl v4l2loopback-dkms
 	curl -O https://raw.github.com/brazier/pmcam/master/pmcam.sh
 
 ### Windows
 
-(Not tested)
-
-* Install [Cygwin](https://www.cygwin.com/) or [MinGW](http://www.mingw.org/)
-* Install [ffmpeg](http://ffmpeg.zeranoe.com/builds/)
-* Install [ImageMagick](http://www.imagemagick.org/script/binary-releases.php)
+Not tested, unsupported. See OS X
 
 
 ## Configuration
 
 The primary config options are:
 
-    DIFF_LIMIT          cut-off for what changes should be saved
-    OUTPUT_DIR          where to save matching imgs
-    CAPTURE_INTERVALS	how often to capture/check for motion.
-    NTFY_TOPIC          Topic to use with ntfy, if NTFY set to true and NTFY_TOPIC is not set, a random 20 char wil be made.
-    
-    Booleans, true/false
-    NTFY                send notifications to ntfy
-    DISPLAY_SKIPPED     display info about ignored images
+    DIFF_LIMIT          Cut-off for what changes should be saved
+    OUTPUT_DIR          Where to save matching imgs
+    CAPTURE_MODE	Images only [1] or video capture [2]
+    VIDEO_FRAMERATE     Framerate of recording
+    VIDEO_SIZE          Resolution of recording
+    REC_WAIT            How many seconds to wait before stopping recording. Prevents many short recordings. (approximately)
+    CAPTURE_INTERVALS	How often to capture/check for motion. (approximately)
+    NTFY                Activate NTFY [true/false]
+    NTFY_TOPIC          Topic to use with ntfy
+    NTFY_TIMEOUT        Minimum seconds between each notification
+    DISPLAY_SKIPPED	Output messages when there is no motion [true/false]
+    DISPLAY_CAPTURE     Output messages when a picture is taken [true/false]
+    DISPLAY_MOTION      Output messages when there is motion [true/false]
 
 Set them as you see fit.
 
@@ -56,4 +64,10 @@ To stop the script, press Ctrl + C.
 
 ## License
 
-MIT
+MIT License
+
+Copyright (c) 2023 brazier 
+Copyright (c) 2020-2021 jaclu 
+Copyright (c) 2014-2019 laurent22 
+
+See [LICENCE](LICENCE.md) for full licence.
