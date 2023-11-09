@@ -18,7 +18,7 @@ CAPTURE_INTERVAL="1" # in seconds
 
 # ntfy topic, make sure to make it random/difficult as it is basicly a password.
 # see ntfy.sh for more information
-NTFY=true
+NTFY=false
 NTFY_TOPIC=""
 NTFY_TIMEOUT="900" #minimum seconds between each notification. 900s = 15m
 
