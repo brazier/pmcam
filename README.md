@@ -1,4 +1,4 @@
-# pmcam - poor man's video capture with motion detection in Bash
+# pmcam2 - poor man's video capture with motion detection in Bash
 
 This simple Bash script captures images from a webcam with motion detection support. I wanted to change some settings from the original, [laurent22/pmcam](https://github.com/jaclu/pmcam), and also add some new features such as video capture and the ability send notifications with [NTFY](https://ntfy.sh). Also borrowed some things from [jaclu/pmcam](https://github.com/jaclu/pmcam)
 
@@ -8,19 +8,21 @@ There are now two modes,
 Image mode: If the frames are different enough, they are kept, otherwise they are deleted. This provide very simple motion detection and avoids filling up the hard drive with duplicate frames.
 
 Video mode: If the frames are different enough, video capture will be started. It will then stop a defined amount of seconds later if no further motion is detected.
+v4l2loopback is used to make a dummy video device, so that motion can still be detected while recording from the camera.
 
 Curl is then used to send a notification to [ntfy.sh](https://ntfy.sh)
 
 ## Installation
 
-### OS X
-
-Not tested, unsupported as of now since v4l2loopback is needed to capture motion and record from the same device
-
 ### Linux (Debian)
 
 	sudo apt-get install ffmpeg imagemagick curl v4l2loopback-dkms
 	curl -O https://raw.github.com/brazier/pmcam/master/pmcam.sh
+
+### OS X
+
+Not tested, unsupported as of now since v4l2loopback is needed to capture motion and record from the same device.
+(Change code to use gstreamer instead of ffmpeg and v4l2loopback would most likely work)
 
 ### Windows
 
@@ -49,25 +51,30 @@ Set them as you see fit.
 
 ## Usage
 
+	sudo modprobe v4l2loopback
 	./pmcam.sh
 
-The script will use the default webcam to capture frames. To capture using a different camera, the ffmpeg command `-i` parameter can be changed - see the [ffmpeg documentation](https://trac.ffmpeg.org/wiki/Capture/Webcam) for more information.
+The script will use the default webcam to capture frames. To capture using a different camera, the variable VIDEO_IN can be changed
+A frame will then be saved approximately every 1 second to the "images" folder next to the Bash script. 
 
-A frame will then be saved approximately every 1 second to the "images" folder next to the Bash script. Both delay and target folder can be changed in the script.
+Both delay and target folder can be changed in the script.
 
+Running the script with all settings as default, and then check the output DIFF with and without motion. Then set your DIFF_LIMIT appropriately, and any other variables you might want to change.
+After you have made sure the script runs to your liking, set DISPLAY_SKIPPED and DISPLAY_CAPTURE to false, to keep the output clean.
 To stop the script, press Ctrl + C.
 
 ## TODO
 
-* Allow specifying the video capture source and format (curently hardcoded)
-* Add option to start video capture on motion instead of just images
-
+* Add sound to video recording
+* Auto set DIFF_LIMIT
+* Clean up code (Variable names & arrays consistency)
+  
 ## License
 
 MIT License
 
-Copyright (c) 2023 brazier 
-Copyright (c) 2020-2021 jaclu 
-Copyright (c) 2014-2019 laurent22 
+Copyright (c) 2023 brazier  
+Copyright (c) 2020-2021 jaclu  
+Copyright (c) 2014-2019 laurent22  
 
-See [LICENCE](LICENCE.md) for full licence.
+See [LICENSE](LICENSE.md) for full licence.
